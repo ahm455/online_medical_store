@@ -3,14 +3,8 @@ from .models import Medicine, ordereditems,order,Customer
 from .forms import medicineForm,OrderedItemsForm,customerForm
 from rest_framework.parsers import JSONParser
 
-def medicine_list(request):
-    medicines = Medicine.objects.all()
-    return render(request, 'medicine_list.html', {'medicines': medicines})
-
-def order_list(request):
-    orders = ordereditems.objects.all()
-    return render(request, 'order_list.html', {'orders': orders})
-
+def dashboard(request):
+    return render(request,'dashboard.html')  
 def add_medicine(request):
     if request.method == 'POST':
             data = request.POST.dict()
@@ -21,6 +15,9 @@ def add_medicine(request):
     else:
         serializer=medicineForm()        
     return render(request,'add_medicine.html',{'serializer':serializer})
+def medicine_list(request):
+    medicines = Medicine.objects.all()
+    return render(request, 'medicine_list.html', {'medicines': medicines})
 
 
 def add_order(request):
@@ -35,10 +32,10 @@ def add_order(request):
             return redirect('order_list')
     else:
             serializer=OrderedItemsForm()         
-    return render(request,'add_order.html',{'serializer':serializer})        
-
-def dashboard(request):
-    return render(request,'dashboard.html')    
+    return render(request,'add_order.html',{'serializer':serializer})          
+def order_list(request):
+    orders = ordereditems.objects.all()
+    return render(request, 'order_list.html', {'orders': orders})
 
 
 def add_customer(request):
