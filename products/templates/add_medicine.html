@@ -6,6 +6,7 @@
     <title>Add Medicine</title>
 </head>
 <body>
+    <a href="{% url 'dashboard' %}">Back to Dashboard</a>
     <h1>Add Medicine</h1>
     <form method="post">
         {% csrf_token %}

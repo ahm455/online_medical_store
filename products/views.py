@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect
-from .models import Medicine, ordereditems
-from .forms import medicineForm,orderedForm
+from .models import Medicine, ordereditems,order,Customer
+from .forms import medicineForm,OrderedItemsForm,customerForm
 
 
 def medicine_list(request):
@@ -24,13 +24,32 @@ def add_medicine(request):
 
 def add_order(request):
     if request.method == 'POST':
-        form = orderedForm(request.POST)
+        form = OrderedItemsForm(request.POST)
         if form.is_valid():
-            form.save()
+            new_order = order.objects.create(customer=form.cleaned_data['customer'])
+            ordered_item = form.save(commit=False)
+            ordered_item.order = new_order 
+            ordered_item.save()
             return redirect('order_list')
     else:
-            form=orderedForm()         
+            form=OrderedItemsForm()         
     return render(request,'add_order.html',{'form':form})        
 
 def dashboard(request):
     return render(request,'dashboard.html')    
+
+
+def add_customer(request):
+    if request.method == 'POST':
+        form = customerForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('customer_list') 
+    else:
+        form = customerForm()
+    return render(request, 'add_customer.html', {'form': form})
+
+
+def customer_list(request):
+    customers = Customer.objects.all()
+    return render(request, 'customer_list.html', {'customers': customers})
