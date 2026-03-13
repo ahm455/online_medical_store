@@ -1,15 +1,16 @@
 from django import forms
 from .models import Medicine, ordereditems,Customer,order
+from django.contrib.auth.models import User
+from rest_framework import serializers
 
-class medicineForm(forms.ModelForm):
+
+class medicineForm(serializers.ModelSerializer):
     class Meta:
         model = Medicine
         fields = ['medicine_name', 'potency', 'cost_price', 'selling_price']
 
-from django import forms
-from .models import order, ordereditems, Customer, Medicine
 
-class OrderedItemsForm(forms.ModelForm):
+class OrderedItemsForm(serializers.ModelSerializer):
     class Meta:
         model = ordereditems
         fields = ['customer', 'medicine', 'quantity']
@@ -19,33 +20,29 @@ OrderedItemsFormSet = forms.inlineformset_factory(
     extra=1, can_delete=True
 )
 
-class OrderForm(forms.ModelForm):
+class OrderForm(serializers.ModelSerializer):
     class Meta:
         model = order
         fields = ['customer']       
 
-from django import forms
-from django.contrib.auth.models import User
-from .models import Customer
 
-class customerForm(forms.ModelForm):
-    username = forms.CharField(max_length=150)
-    email = forms.EmailField()
-    password = forms.CharField(widget=forms.PasswordInput)
+
+
+class customerForm(serializers.ModelSerializer):
+    username = serializers.CharField(max_length=150)
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True)
 
     class Meta:
         model = Customer
         fields = ['name', 'age', 'phone', 'username', 'email', 'password']
 
-    def save(self, commit=True):
-        user = User.objects.create_user(
-            username=self.cleaned_data['username'],
-            email=self.cleaned_data['email'],
-            password=self.cleaned_data['password']
-        )
-    
-        customer = super().save(commit=False)
-        customer.user = user
-        if commit:
-            customer.save()
+    def create(self, validated_data):
+        username = validated_data.pop('username')
+        email = validated_data.pop('email')
+        password = validated_data.pop('password')
+
+        user = User.objects.create_user(username=username, email=email, password=password)
+
+        customer = Customer.objects.create(user=user, **validated_data)
         return customer

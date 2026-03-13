@@ -23,11 +23,11 @@
         <td>{{ customer.name }}</td>
         <td>{{ customer.age }}</td>
         <td>{{ customer.user.username }}</td>
-        <td>{{ customer.user.phone }}</td>
+        <td>{{ customer.phone }}</td>
     </tr>
     {% empty %}
     <tr>
-        <td colspan="5">No customers found</td>
+        <td >No customers found</td>
     </tr>
     {% endfor %}
 

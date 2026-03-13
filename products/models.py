@@ -28,7 +28,7 @@ class order(models.Model):
 
 class ordereditems(models.Model):
     order = models.ForeignKey(order, on_delete=models.CASCADE)
-    customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True)
+    customer = models.ForeignKey('Customer', on_delete=models.SET_NULL, null=True)
     medicine = models.ForeignKey('Medicine', on_delete=models.CASCADE)
     quantity = models.IntegerField()
     selling_price = models.DecimalField(max_digits=10, decimal_places=2)

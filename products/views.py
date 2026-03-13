@@ -1,7 +1,7 @@
 from django.shortcuts import render,redirect
 from .models import Medicine, ordereditems,order,Customer
 from .forms import medicineForm,OrderedItemsForm,customerForm
-
+from rest_framework.parsers import JSONParser
 
 def medicine_list(request):
     medicines = Medicine.objects.all()
@@ -13,41 +13,43 @@ def order_list(request):
 
 def add_medicine(request):
     if request.method == 'POST':
-            form = medicineForm(request.POST)
-            if form.is_valid():
-                form.save()
+            data = request.POST.dict()
+            serializer = medicineForm(data=data)
+            if serializer.is_valid():
+                serializer.save()
                 return redirect('medicine_list')
     else:
-        form=medicineForm()        
-    return render(request,'add_medicine.html',{'form':form})
+        serializer=medicineForm()        
+    return render(request,'add_medicine.html',{'serializer':serializer})
 
 
 def add_order(request):
     if request.method == 'POST':
-        form = OrderedItemsForm(request.POST)
-        if form.is_valid():
-            new_order = order.objects.create(customer=form.cleaned_data['customer'])
-            ordered_item = form.save(commit=False)
+        data = request.POST.dict()
+        serializer = OrderedItemsForm(data=data)
+        if serializer.is_valid():
+            new_order = order.objects.create(customer=serializer.validated_data['customer'])
+            ordered_item = serializer.save(commit=False)
             ordered_item.order = new_order 
             ordered_item.save()
             return redirect('order_list')
     else:
-            form=OrderedItemsForm()         
-    return render(request,'add_order.html',{'form':form})        
+            serializer=OrderedItemsForm()         
+    return render(request,'add_order.html',{'serializer':serializer})        
 
 def dashboard(request):
     return render(request,'dashboard.html')    
 
 
 def add_customer(request):
-    if request.method == 'POST':
-        form = customerForm(request.POST)
-        if form.is_valid():
-            form.save()
+    if request.method == 'POST':    
+        serializer = customerForm(data=request.POST)
+        if serializer.is_valid():
+            serializer.save()
             return redirect('customer_list') 
     else:
-        form = customerForm()
-    return render(request, 'add_customer.html', {'form': form})
+        serializer = customerForm()
+    return render(request, 'add_customer.html', {'serializer': serializer})
 
 
 def customer_list(request):
