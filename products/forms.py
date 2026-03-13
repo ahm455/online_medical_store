@@ -15,18 +15,6 @@ class OrderedItemsForm(serializers.ModelSerializer):
         model = ordereditems
         fields = ['customer', 'medicine', 'quantity']
 
-OrderedItemsFormSet = forms.inlineformset_factory(
-    order, ordereditems, form=OrderedItemsForm,
-    extra=1, can_delete=True
-)
-
-class OrderForm(serializers.ModelSerializer):
-    class Meta:
-        model = order
-        fields = ['customer']       
-
-
-
 
 class customerForm(serializers.ModelSerializer):
     username = serializers.CharField(max_length=150)
