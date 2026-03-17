@@ -45,7 +45,7 @@ def add_customer(request):
             serializer.save()
             return redirect('customer_list') 
     else:
-        serializer = customerForm()
+        serx`ializer = customerForm()
     return render(request, 'add_customer.html', {'serializer': serializer})
 
 

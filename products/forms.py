@@ -15,6 +15,11 @@ class OrderedItemsForm(serializers.ModelSerializer):
         model = ordereditems
         fields = ['customer', 'medicine', 'quantity']
 
+class OrderForm(serializers.ModelSerializer):
+    class Meta:
+        model = order
+        fields = ['customer']
+        
 
 class customerForm(serializers.ModelSerializer):
     username = serializers.CharField(max_length=150)

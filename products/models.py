@@ -37,7 +37,7 @@ class ordereditems(models.Model):
     def save(self, *args, **kwargs):
         if self.medicine:
             self.selling_price = self.medicine.selling_price
-
+                
         if self.quantity and self.selling_price:
             self.total_price = self.quantity * self.selling_price
 
