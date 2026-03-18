@@ -3,7 +3,7 @@ from django.utils import timezone
 from datetime import timedelta
 from django.db.models import Sum
 from .models import Customer, Medicine, Stock, Order, OrderedItem, Profit
-from .forms import customerform, medicineForm, StockForm, OrderedItemsForm, OrderForm
+from .serializer import customerform, medicineForm, StockForm, OrderedItemsForm, OrderForm
 
 def dashboard(request):
     total_orders = Order.objects.count()
