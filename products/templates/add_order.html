@@ -1,37 +1,20 @@
+{% load rest_framework %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Order</title>
 </head>
 <body>
-<a href="{% url 'dashboard' %}">Back to Dashboard</a>
-    <h2>Add Order</h2>
+    <a href="{% url 'dashboard' %}">Back to Dashboard</a>
+    <h1>Add Order</h1>
     <form method="post">
         {% csrf_token %}
-        <h3>Ordered Items</h3>
-        {% for field in items_form %}
-            <p>
-                {{ field.label_tag }}<br>
-                {{ field }}<br>
-                {% if field.errors %}
-                    <span style="color:red;">{{ field.errors }}</span>
-                {% endif %}
-            </p>
-        {% endfor %}
-
-        {% for field in order_form %}
-            <p>
-                {{ field.label_tag }}<br>
-                {{ field }}<br>
-                {% if field.errors %}
-                    <span style="color:red;">{{ field.errors }}</span>
-                {% endif %}
-            </p>
-        {% endfor %}
-
+        <h2>Ordered Item</h2>
+        {% render_form items_form %}
+        {% render_form order_form %}
         
-
         <button type="submit">Add Order</button>
     </form>
 </body>

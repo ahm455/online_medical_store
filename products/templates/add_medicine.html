@@ -12,7 +12,7 @@
     <h1>Add Medicine</h1>
     <form method="post">
         {% csrf_token %}
-        {{ form.as_p }}
+     {% render_form serializer %}
         <button type="submit">Add Medicine</button>
     </form>
 </body>

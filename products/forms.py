@@ -1,52 +1,42 @@
-from django import forms
-from .models import Medicine, OrderedItem, Customer, Order, Stock, Profit
-from django.contrib.auth.models import User
 from rest_framework import serializers
+from .models import Medicine, OrderedItem, Customer, Order, Stock
 
-
-class medicineForm(forms.ModelForm):
+class medicineForm(serializers.ModelSerializer):
     class Meta:
         model = Medicine
-        fields = ['medicine_name', 'potency', 'cost_price', 'selling_price']
+        fields = ['id', 'medicine_name', 'potency', 'cost_price', 'selling_price']
 
-class OrderedItemsForm(forms.ModelForm):
-    customer = forms.ModelChoiceField(queryset=Customer.objects.all(), empty_label="Select Customer")
-    medicine = forms.ModelChoiceField(queryset=Medicine.objects.all(), empty_label="Select Medicine")
+class customerform(serializers.ModelSerializer):
+    class Meta:
+        model = Customer
+        fields = ['id', 'name', 'age', 'phone']
+
+class OrderedItemsForm(serializers.ModelSerializer):
+    customer = serializers.PrimaryKeyRelatedField(queryset=Customer.objects.all())
+    medicine = serializers.PrimaryKeyRelatedField(queryset=Medicine.objects.all())
 
     class Meta:
         model = OrderedItem
-        fields = ['customer', 'medicine', 'quantity']
+        fields = ['id', 'customer', 'medicine', 'quantity']
 
-class OrderForm(forms.ModelForm):
+class OrderForm(serializers.ModelSerializer):
     class Meta:
         model = Order
-        fields = ['status', 'payment_status', 'payment_method']
+        fields = ['id', 'status', 'payment_status', 'payment_method']
 
-
-class customerform(forms.ModelForm):
-    class Meta:
-        model = Customer
-        fields = ['name', 'age', 'phone']
-
-    def save(self, commit=True):
-        customer = super().save(commit=False)
-
-        if commit:
-            customer.save()
-        return customer
-
-class StockForm(forms.ModelForm):
+class StockForm(serializers.ModelSerializer):
     class Meta:
         model = Stock
-        fields = ['medicine', 'quantity']
+        fields = ['id', 'medicine', 'quantity']
 
-    def save(self, commit=True):
-        medicine = self.cleaned_data['medicine']
-        quantity = self.cleaned_data['quantity']
-        try:
-            stock_instance = Stock.objects.get(medicine=medicine)
+    def create(self, validated_data):
+        medicine = validated_data['medicine']
+        quantity = validated_data['quantity']
+        stock_instance, created = Stock.objects.get_or_create(medicine=medicine)
+        if not created:
             stock_instance.quantity += quantity
             stock_instance.save()
-            return stock_instance
-        except Stock.DoesNotExist:
-            return super().save(commit=commit)
+        else:
+            stock_instance.quantity = quantity
+            stock_instance.save()
+        return stock_instance
