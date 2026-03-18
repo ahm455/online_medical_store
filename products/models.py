@@ -78,33 +78,6 @@ class OrderedItem(models.Model):
     total_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     profit_per_item = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
 
-    def save(self, *args, **kwargs):
-        if self.medicine:
-            self.selling_price = self.medicine.selling_price
-
-        if self.quantity and self.selling_price:
-            self.total_price = self.quantity * self.selling_price
-
-        if self.medicine:
-            self.profit_per_item = (self.selling_price - self.medicine.cost_price) * self.quantity
-
-        super().save(*args, **kwargs)
-
-        stock_obj = Stock.objects.get(medicine=self.medicine)
-        stock_obj.quantity -= self.quantity
-        stock_obj.save()
-
-        self.order.update_total()
-
-    def delete(self, *args, **kwargs):
-        stock_obj = Stock.objects.get(medicine=self.medicine)
-        stock_obj.quantity += self.quantity
-        stock_obj.save()
-
-        super().delete(*args, **kwargs)
-
-        self.order.update_total()
-
     def __str__(self):
         return f"{self.medicine} x {self.quantity}"
 

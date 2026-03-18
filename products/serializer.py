@@ -11,14 +11,35 @@ class customerform(serializers.ModelSerializer):
         model = Customer
         fields = ['id', 'name', 'age', 'phone']
 
-class OrderedItemsForm(serializers.ModelSerializer):
+class OrderedItemsSerializer(serializers.ModelSerializer):
     customer = serializers.PrimaryKeyRelatedField(queryset=Customer.objects.all())
     medicine = serializers.PrimaryKeyRelatedField(queryset=Medicine.objects.all())
 
     class Meta:
         model = OrderedItem
-        fields = ['id', 'customer', 'medicine', 'quantity']
+        fields = ['id', 'order', 'customer', 'medicine', 'quantity']
 
+    def create(self, validated_data):
+        medicine = validated_data['medicine']
+        quantity = validated_data['quantity']
+        order = validated_data['order']
+
+        selling_price = medicine.selling_price
+        total_price = selling_price * quantity
+        profit = (selling_price - medicine.cost_price) * quantity
+
+
+        item = OrderedItem.objects.create(
+            **validated_data,
+            selling_price=selling_price,
+            total_price=total_price,
+            profit_per_item=profit
+        )
+        stock = Stock.objects.get(medicine=medicine)
+        stock.quantity -= quantity
+        stock.save()
+        order.update_total()
+        return item
 class OrderForm(serializers.ModelSerializer):
     class Meta:
         model = Order
