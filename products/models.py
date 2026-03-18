@@ -5,7 +5,6 @@ from django.db.models import Sum
 
 
 class Customer(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     age = models.IntegerField()
     phone = models.CharField(max_length=20)

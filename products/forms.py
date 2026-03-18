@@ -19,7 +19,7 @@ class OrderedItemsForm(forms.ModelForm):
         customer = validated_data.get('customer')
         medicine = validated_data.get('medicine')
         quantity = validated_data.get('quantity')
-        order = validated_data.get('order')  # passed from view
+        order = validated_data.get('order')
 
         try:
             stock_obj = Stock.objects.get(medicine=medicine)
@@ -50,18 +50,13 @@ class OrderForm(forms.ModelForm):
         fields = ['payment_status', 'payment_method', 'status']
 
 
-from django import forms
-from .models import Customer
-
 class customerform(forms.ModelForm):
     class Meta:
         model = Customer
-        fields = ['name', 'age', 'phone']  # no user input
+        fields = ['name', 'age', 'phone']
 
     def save(self, commit=True):
         customer = super().save(commit=False)
-        from django.contrib.auth.models import User
-        customer.user = User.objects.first()  # assign the same user to all customers
         if commit:
             customer.save()
         return customer
