@@ -75,17 +75,6 @@ def stock_list(request):
     stocks = Stock.objects.all()
     return render(request, 'stock_list.html', {'stocks': stocks})
 
-def update_stock(request, stock_id):
-    stock_instance = get_object_or_404(Stock, id=stock_id)
-    if request.method == 'POST':
-        serializer = StockForm(stock_instance, data=request.POST)
-        if serializer.is_valid():
-            serializer.save()
-            return redirect('stock_list')
-    else:
-        serializer = StockForm(stock_instance)
-    return render(request, 'update_stock.html', {'form': serializer})
-
 def add_order(request):
     if request.method == 'POST':
         order_serializer = OrderForm(data=request.POST)
