@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Order</title>
+</head>
+<body>
+    <h1>Add Order</h1>
+
+    <form method="POST">
+        {% csrf_token %}
+        <h2>Order Details</h2>
+        {{ order_form.as_p }}
+        <h2>Ordered Item</h2>
+        {{ item_form.as_p }}
+        <button type="submit">Save Order</button>
+    </form>
+
+    <a href="{% url 'orders:order_list' %}">Back to Order List</a>
+</body>
+</html>
