@@ -4,24 +4,13 @@ from .models import Medicine, Stock
 class MedicineSerializer(serializers.ModelSerializer):
     class Meta:
         model = Medicine
-        fields = '__all__'
+        fields = ['medicine_name','potency','cost_price','selling_price',]
 
 
 class StockSerializer(serializers.ModelSerializer):
+    medicine = serializers.PrimaryKeyRelatedField(
+        queryset=Medicine.objects.all()  # <-- This ensures all medicines appear
+    )
     class Meta:
         model = Stock
         fields = '__all__'
-
-    def create(self, validated_data):
-        medicine = validated_data['medicine']
-        quantity = validated_data['quantity']
-
-        stock, created = Stock.objects.get_or_create(medicine=medicine)
-
-        if not created:
-            stock.quantity += quantity
-        else:
-            stock.quantity = quantity
-
-        stock.save()
-        return stock

@@ -1,35 +1,45 @@
 from django.shortcuts import render, redirect
-from .models import Order, Profit,Customer
-from products.models import Stock,Medicine
-from .serializers import OrderSerializer, OrderedItemSerializer
 from django.utils import timezone
 from datetime import timedelta
 from django.db.models import Sum
-
+from .models import Order, Profit
+from customers.models import Customer
+from products.models import Medicine, Stock
+from .serializers import OrderSerializer, OrderedItemSerializer
 
 def add_order(request):
+    customers = Customer.objects.all()
+    medicines = Medicine.objects.all()
+
     if request.method == 'POST':
         order_serializer = OrderSerializer(data=request.POST)
-        item_serializer = OrderedItemSerializer(data=request.POST)
-
-        if order_serializer.is_valid() and item_serializer.is_valid():
+        if order_serializer.is_valid():
             order = order_serializer.save()
-            item_serializer.save(order=order)
+            
+            medicine_id = int(request.POST['medicine'])
+            medicine = Medicine.objects.get(id=medicine_id)
+            quantity = int(request.POST['quantity'])
 
-            profit = Profit.objects.create(order=order)
-            profit.calculate_profit()
-
-            return redirect('order_list')
+            ordered_item_serializer = OrderedItemSerializer(data={
+                'order': order.id,
+                'medicine': medicine.id,
+                'quantity': quantity
+            })
+            if ordered_item_serializer.is_valid():
+                item = ordered_item_serializer.save()
+                ordered_item_serializer.calculate_profit(order)
+                return redirect('orders:order_list')
 
     else:
         order_serializer = OrderSerializer()
-        item_serializer = OrderedItemSerializer()
+        ordered_item_serializer = OrderedItemSerializer()
 
     return render(request, 'orders/add_order.html', {
-        'order_form': order_serializer,
-        'item_form': item_serializer
+        'order_serializer': order_serializer,
+        'ordered_item_serializer': ordered_item_serializer,
+        'customers': customers,
+        'medicines': medicines
     })
-
 
 def order_list(request):
     orders = Order.objects.all()
@@ -66,7 +76,7 @@ def dashboard(request):
 def profit_report(request):
     profits = Profit.objects.select_related('order', 'order__customer').all()
     today = timezone.now()
-    start_week = today - timezone.timedelta(days=today.weekday())
+    start_week = today - timedelta(days=today.weekday())
     weekly_profits = Profit.objects.filter(order__created_at__gte=start_week).aggregate(total=Sum('profit_amount'))['total'] or 0
     start_month = today.replace(day=1)
     monthly_profits = Profit.objects.filter(order__created_at__gte=start_month).aggregate(total=Sum('profit_amount'))['total'] or 0
@@ -76,3 +86,15 @@ def profit_report(request):
         'monthly_profits': monthly_profits,
     }
     return render(request, 'orders/profit.html', context)
+
+def order_shipped(request, order_id):
+    order = Order.objects.get(id=order_id)
+    order.status = 'Shipped'
+    order.save()
+    return redirect('orders:order_list')    
+
+def order_delivered(request, order_id):
+    order = Order.objects.get(id=order_id)
+    order.status = 'Delivered'
+    order.save()
+    return redirect('orders:order_list')

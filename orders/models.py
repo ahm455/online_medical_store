@@ -40,7 +40,6 @@ class OrderedItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     medicine = models.ForeignKey(Medicine, on_delete=models.CASCADE)
     quantity = models.IntegerField()
-
     selling_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     total_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     profit_per_item = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
@@ -48,13 +47,8 @@ class OrderedItem(models.Model):
 
 class Profit(models.Model):
     order = models.OneToOneField(Order, on_delete=models.CASCADE)
-    profit_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    profit_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0) 
 
-    def calculate_profit(self):
-        items = self.order.ordereditem_set.all()
-
-        total_cost = sum(item.medicine.cost_price * item.quantity for item in items)
-        total_sell = sum(item.total_price for item in items)
-
-        self.profit_amount = total_sell - total_cost
-        self.save()
+    def __str__(self):
+        return f"{self.order} ({self.profit})"
+    

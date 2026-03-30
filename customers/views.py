@@ -7,11 +7,11 @@ def add_customer(request):
         serializer = CustomerSerializer(data=request.POST)
         if serializer.is_valid():
             serializer.save()
-            return redirect('customer_list')
+            return redirect('customers:customer_list')
     else:
         serializer = CustomerSerializer()
 
-    return render(request, 'customers/add_customer.html', {'form': serializer})
+    return render(request, 'customers/add_customer.html', {'serializer': serializer})
 
 
 def customer_list(request):

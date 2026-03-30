@@ -4,14 +4,30 @@
     <title>Add Stock</title>
 </head>
 <body>
-    <h1>Add Stock</h1>
 
-    <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Save Stock</button>
-    </form>
+<h2>Add Stock</h2>
 
-    <a href="{% url 'products:stock_list' %}">Back to Stock List</a>
+<form method="POST">
+    {% csrf_token %}
+
+    <p>
+        <label>Medicine</label><br>
+        <select name="medicine">
+    {% for med in serializer.fields.medicine.queryset %}
+        <option value="{{ med.id }}">{{ med.medicine_name }} ({{ med.potency }})</option>
+    {% endfor %}
+</select>
+    </p>
+
+    <p>
+        <label>Quantity</label><br>
+        <input type="number" name="quantity">
+    </p>
+
+    <button type="submit">Save</button>
+</form>
+
+<a href="{% url 'products:stock_list' %}">Back</a>
+
 </body>
 </html>

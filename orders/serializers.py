@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Order, OrderedItem, Profit
 from products.models import Stock
+from django.db.models import Sum
 
 
 class OrderedItemSerializer(serializers.ModelSerializer):
@@ -31,6 +32,16 @@ class OrderedItemSerializer(serializers.ModelSerializer):
 
         order.update_total()
         return item
+    def calculate_profit(self, order):
+        total_profit = order.ordereditem_set.aggregate(
+            total=Sum('profit_per_item')
+        )['total'] or 0
+
+        Profit.objects.update_or_create(
+            order=order,
+            defaults={'profit_amount': total_profit}
+        )
+
 
 
 class OrderSerializer(serializers.ModelSerializer):
