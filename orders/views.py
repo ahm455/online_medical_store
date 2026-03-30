@@ -5,7 +5,7 @@ from django.db.models import Sum
 from .models import Order, Profit
 from customers.models import Customer
 from products.models import Medicine, Stock
-from .serializers import OrderSerializer, OrderedItemSerializer
+from .serializers import OrderedItemSerializer, OrderSerializer
 
 def add_order(request):
     customers = Customer.objects.all()
@@ -43,6 +43,10 @@ def add_order(request):
 
 def order_list(request):
     orders = Order.objects.all()
+    for order in orders:
+        if order.total_amount is None:
+            order.total_amount = 0
+            
     return render(request, 'orders/order_list.html', {'orders': orders})
 
 def dashboard(request):
@@ -77,7 +81,8 @@ def profit_report(request):
     profits = Profit.objects.select_related('order', 'order__customer').all()
     today = timezone.now()
     start_week = today - timedelta(days=today.weekday())
-    weekly_profits = Profit.objects.filter(order__created_at__gte=start_week).aggregate(total=Sum('profit_amount'))['total'] or 0
+    start_week = start_week.replace(hour=0, minute=0, second=0, microsecond=0)
+    weekly_profits = Profit.objects.filter(order__created_at__gte=start_week).aggregate(total=Sum('profit_amount'))['total'] or None
     start_month = today.replace(day=1)
     monthly_profits = Profit.objects.filter(order__created_at__gte=start_month).aggregate(total=Sum('profit_amount'))['total'] or 0
     context = {

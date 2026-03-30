@@ -1,3 +1,5 @@
 from django.contrib import admin
+from .models import Order, OrderedItem, Profit
 
-# Register your models here.
+admin.site.register(Profit)
+admin.site.register(Order)

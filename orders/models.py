@@ -28,7 +28,7 @@ class Order(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
     payment_status = models.CharField(max_length=10, choices=PAYMENT_STATUS, default='Unpaid')
     payment_method = models.CharField(max_length=10, choices=PAYMENT_METHOD, null=True, blank=True)
-    total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    total_amount = models.DecimalField(max_digits=100, decimal_places=2, default=0)
 
     def update_total(self):
         total = self.ordereditem_set.aggregate(total=Sum('total_price'))['total'] or 0
@@ -40,15 +40,15 @@ class OrderedItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     medicine = models.ForeignKey(Medicine, on_delete=models.CASCADE)
     quantity = models.IntegerField()
-    selling_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    total_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    profit_per_item = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    selling_price = models.DecimalField(max_digits=100, decimal_places=2, blank=True, null=True)
+    total_price = models.DecimalField(max_digits=100, decimal_places=2, blank=True, null=True)
+    profit_per_item = models.DecimalField(max_digits=100, decimal_places=2, blank=True, null=True)
 
 
 class Profit(models.Model):
     order = models.OneToOneField(Order, on_delete=models.CASCADE)
-    profit_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0) 
+    profit_amount = models.DecimalField(max_digits=100, decimal_places=2, default=0) 
 
     def __str__(self):
-        return f"{self.order} ({self.profit})"
+        return f"{self.order} ({self.profit_amount})"
     

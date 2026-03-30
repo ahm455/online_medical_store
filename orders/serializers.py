@@ -41,10 +41,11 @@ class OrderedItemSerializer(serializers.ModelSerializer):
             order=order,
             defaults={'profit_amount': total_profit}
         )
-
-
-
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = '__all__'
+
+
+
+

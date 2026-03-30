@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect,get_object_or_404
 from .models import Medicine, Stock
 from .serializer import MedicineSerializer, StockSerializer
 
@@ -16,7 +16,6 @@ def add_medicine(request):
 def medicine_list(request):
     medicines = Medicine.objects.all()
     return render(request, 'products/medicine_list.html', {'medicines': medicines})
-
 
 def add_stock(request):
 
@@ -37,3 +36,15 @@ def add_stock(request):
 def stock_list(request):
     stocks = Stock.objects.all()
     return render(request, 'products/stock_list.html', {'stocks': stocks})
+
+def edit_medicine(request,id):
+    medicine=get_object_or_404(Medicine,id=id)
+
+    if request.method=='POST':
+        serializer=MedicineSerializer(medicine,data=request.POST)
+        if serializer.is_valid():
+            serializer.save()
+            return redirect('products:medicine_list')
+    else:
+        serializer=MedicineSerializer(medicine)
+    return render  (request,'products/edit_medicine.html',{'serializer':serializer,'medicine': medicine})
