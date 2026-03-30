@@ -4,4 +4,4 @@ from .models import Customer
 class CustomerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Customer
-        fields = [ 'name', 'age', 'phone']
+        fields = [ 'name', 'age', 'phone', 'address', 'city']

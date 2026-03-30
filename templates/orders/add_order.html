@@ -1,10 +1,5 @@
-<!-- add_order.html -->
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Add Order</title>
-</head>
-<body>
+{% extends 'base.html' %}
+{% block content %}
 
 <h2>Add Order</h2>
 
@@ -46,10 +41,6 @@
         </select>
     </p>
 
-    <hr>
-
-    <h3>Add Ordered Item</h3>
-
     <p>
         <label>Medicine:</label><br>
         <select name="medicine">
@@ -67,7 +58,6 @@
     <button type="submit">Add Order</button>
 </form>
 
-<a href="{% url 'orders:dashboard' %}">dashboard<a/>
+<a href="{% url 'orders:dashboard' %}">Dashboard</a>
 
-</body>
-</html>
+{% endblock %}

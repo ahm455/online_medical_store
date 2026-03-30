@@ -1,27 +1,44 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Add Customer</title>
-</head>
-<body>
+{% extends 'base.html' %}
+{% block content %}
 
 <h2>Add Customer</h2>
 
 <form method="POST">
     {% csrf_token %}
 
-    {% for field in serializer.fields %}
-        <p>
-            <label>{{ field|capfirst }}</label><br>
-            <input type="text" name="{{ field }}" 
-                   value="{{ serializer.data.field }}">
-        </p>
-    {% endfor %}
+    <p>
+        <label>Name:</label><br>
+        <input type="text" name="name" value="{{ serializer.data.name|default:'' }}">
+    </p>
 
-    <button type="submit">Save</button>
+    <p>
+        <label>Age:</label><br>
+        <input type="age" name="age" value="{{ serializer.data.age|default:'' }}">
+    </p>
+
+    <p>
+        <label>Phone:</label><br>
+        <input type="text" name="phone" value="{{ serializer.data.phone|default:'' }}">
+    </p>
+    <label>Address</label><br>
+        <input type="text" name="address" value="{{ serializer.data.address|default:'' }}">
+    </p>
+    
+
+    <p>
+        <label>City:</label><br>
+        <select name="city">
+            {% for val, display in serializer.fields.city.choices.items %}
+                <option value="{{ val }}" {% if serializer.data.city == val %}selected{% endif %}>
+                    {{ display }}
+                </option>
+            {% endfor %}
+        </select>
+    </p>
+
+    <button type="submit">Add Customer</button>
 </form>
 
-<a href="{% url 'orders:dashboard' %}">dashboard<a/>
+<a href="{% url 'orders:dashboard' %}">Dashboard</a>
 
-</body>
-</html>
+{% endblock %}
