@@ -1,12 +1,10 @@
 from django.urls import path
 from . import views
-
+from .views import medicine_list , add_medicine , add_stock
 app_name = 'products'
 
 urlpatterns = [ 
-    path('add/', views.add_medicine, name='add_medicine'),
-    path('edit/<int:id>/', views.edit_medicine, name='edit_medicine'),      
-    path('list/', views.medicine_list, name='medicine_list'),   
-    path('add-stock/', views.add_stock, name='add_stock'),      
-    path('list-stock/', views.stock_list, name='stock_list'),   
+    path('add/', add_medicine.as_view(), name='add_medicine'),
+    path('list/', medicine_list.as_view(), name='medicine_list'), 
+    path('add_stock/', add_stock.as_view(), name='add_stock')  
 ]
