@@ -1,11 +1,10 @@
-from django.views.generic import ListView,CreateView
+from django.views.generic import ListView ,CreateView ,UpdateView ,DeleteView
 from .models import Order
 from django.urls import reverse_lazy
 from customers.models import Customer
 from products.models import Medicine
 from django.db.models.functions import TruncDate
 from django.db.models import Sum
-
 
 class add_order(CreateView):
     model = Order
@@ -40,3 +39,11 @@ class daily_profit(ListView):
             .order_by('-date')
         )
         return qs
+class update_order(UpdateView):
+    model = Order
+    fields = '__all__'
+    success_url = reverse_lazy('orders:order_list')         
+
+class delete_order(DeleteView):
+        model = Order
+        success_url = reverse_lazy('orders:order_list')

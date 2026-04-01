@@ -1,6 +1,6 @@
 from .models import Medicine
 from django.urls import reverse_lazy
-from django.views.generic import ListView ,CreateView ,UpdateView
+from django.views.generic import ListView ,CreateView ,UpdateView ,DeleteView
 
 class add_medicine(CreateView):
     model = Medicine
@@ -13,9 +13,15 @@ class add_stock(UpdateView):
     success_url = reverse_lazy('products:medicine_list')
  
     def form_valid(self, form):
-        added_qty = form.cleaned_data['quantity']
-        form.instance.quantity = form.instance.quantity + added_qty
+        order = form.save(commit=False)
+        added_qty = order.quantity
+        form.instance.quantity = form.instance.quantity
         return super().form_valid(form)
+
+class delete_medicine(DeleteView):
+        model = Medicine
+        success_url = reverse_lazy('products:medicine_list')
+
 
 class medicine_list(ListView):
     model = Medicine

@@ -26,6 +26,11 @@
             <td>{{ customer.address}}</td>
             <td>{{ customer.city }}</td>
             <td>{{ customer.phone }}</td>
+            <td><a href="{% url 'customers:update_customer' customer.id %}">Update </a>
+                <a href="{% url 'customers:delete_customer' customer.id %}">
+                Delete
+                </a>
+            </td>
         </tr>
         {% endfor %}
     </table>

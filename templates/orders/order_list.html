@@ -17,6 +17,7 @@
         <th>Payment Status</th>
         <th>Payment Method</th>
         <th>profit</th>
+        <th>Actions</th>
     </tr>
 
     {% for order in object_list %}
@@ -31,7 +32,11 @@
         <td>{{ order.payment_status }}</td>
         <td>{{ order.payment_method }}</td>
         <td>{{ order.profit_amount }}</td>
-
+        <td><a href="{% url 'orders:update_order' order.id %}">Update </a>
+                <a href="{% url 'orders:delete_order' order.id %}">
+                Delete
+                </a>
+            </td>
         </tr>
     {% endfor %}
 </table>

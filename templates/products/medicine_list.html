@@ -30,7 +30,11 @@
             <td>{{ medicine.cost_price }}</td>
             <td>{{ medicine.selling_price }}</td>
             <td>{{medicine.expiry_date}}</td>
-            <td><a href="{% url 'products:add_stock' medicine.id %}">Add Stock</a></td>
+            <td><a href="{% url 'products:add_stock' medicine.id %}">Update Stock</a>
+                <a href="{% url 'products:delete_medicine' medicine.id %}">
+                Delete
+                </a>
+            </td>
 
 
         </tr>

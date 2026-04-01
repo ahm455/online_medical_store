@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from .models import Customer
-from django.views.generic import ListView , CreateView
+from django.views.generic import ListView ,CreateView ,UpdateView ,DeleteView
 from django.urls import reverse_lazy
 from django.contrib.auth.models import User
 from django import forms
@@ -26,3 +26,12 @@ class add_customer(CreateView):
 
 class customer_list(ListView):
     model = Customer
+
+class update_customer(UpdateView):
+    model = Customer
+    fields = '__all__'
+    success_url = reverse_lazy('customers:customer_list') 
+
+class delete_customer(DeleteView):
+        model = Customer
+        success_url = reverse_lazy('customers:customer_list')
