@@ -30,7 +30,7 @@ class Order(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Pending')
     payment_status = models.CharField(max_length=10, choices=PAYMENT_STATUS, default='Unpaid')
-    payment_method = models.CharField(max_length=10, choices=PAYMENT_METHOD, null=True, blank=True)
+    payment_method = models.CharField(max_length=10, choices=PAYMENT_METHOD, blank=True)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     profit_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     selling_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)       
