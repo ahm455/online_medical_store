@@ -7,7 +7,7 @@ from django.db.models.functions import TruncDate
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
-        fields = ['id', 'customer','payment_method','payment_status']
+        fields = ['id', 'customer','status','payment_method','payment_status']
 
 
 class OrderedItemSerializer(serializers.ModelSerializer):

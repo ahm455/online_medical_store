@@ -1,8 +1,10 @@
 from django.db import models
+from django.contrib.auth.models import User
+from orders.common import CreateUpdateTime
 from django.contrib.auth.models import AbstractUser
-from orders.common import Create_Update_Time
 
-class Customer(Create_Update_Time):
+class Customer(CreateUpdateTime,AbstractUser):
+    # user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='customer')
     name = models.CharField(max_length=20)
     age = models.IntegerField()
     phone = models.CharField(max_length=11)

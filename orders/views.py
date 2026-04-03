@@ -1,13 +1,12 @@
 from rest_framework import generics
 from rest_framework.response import Response
-from django.db.models import Sum, F, Model
 from django.db.models.functions import TruncDate
 import orders
 from .models import Order, OrderedItems
 from .serializers import OrderSerializer, OrderedItemSerializer
 from django.views.generic import ListView
 
-class CreateOrderView(generics.ListCreateAPIView):
+class CreateListOrderView(generics.ListCreateAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
 
@@ -25,18 +24,6 @@ class AddItemsView(generics.ListCreateAPIView):
     def get_queryset(self):
         order_id = self.kwargs['order_id']
         return OrderedItems.objects.filter(order_id=order_id)
-
-    def perform_create(self, serializer):
-        order_id = self.kwargs['order_id']
-        item = serializer.save(order_id=order_id)
-        order = item.order
-        totals = order.items.aggregate(
-            total_amount=Sum(F('medicine__selling_price') * F('quantity')),
-            profit_amount=Sum((F('medicine__selling_price') - F('medicine__cost_price')) * F('quantity'))
-        )
-        order.total_amount = totals['total_amount'] or 0
-        order.profit_amount = totals['profit_amount'] or 0
-        order.save()
 
 class DailyProfitView(generics.ListAPIView):
     def get_queryset(self):
