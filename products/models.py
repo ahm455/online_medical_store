@@ -1,6 +1,7 @@
 from django.db import models
+from orders.common import Create_Update_Time
 
-class Medicine(models.Model):
+class Medicine(Create_Update_Time):
     name = models.CharField(max_length=30)
     potency = models.CharField(max_length=20)
     cost_price = models.DecimalField(max_digits=10, decimal_places=2)
@@ -10,3 +11,4 @@ class Medicine(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.potency})"
+

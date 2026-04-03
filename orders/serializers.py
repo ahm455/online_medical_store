@@ -1,47 +1,47 @@
-# from rest_framework import serializers
-# from .models import Order
-# from products.models import Medicine
-# from django.db.models import Sum
+from rest_framework import serializers
+from .models import Order,OrderedItems
+from products.models import Medicine
+from django.db.models import Sum
+from django.db.models.functions import TruncDate
+
+class OrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = ['id', 'customer','payment_method','payment_status']
 
 
-# class OrderedItemSerializer(serializers.ModelSerializer):
+class OrderedItemSerializer(serializers.ModelSerializer):
+    medicine_name = serializers.CharField(source='medicine.name', read_only=True)
+    customer_name = serializers.CharField(source='order.customer.name', read_only=True)
+    class Meta:
+        model = OrderedItems
+        fields = '__all__'
 
-#     class Meta:
-#         model = Order
-#         fields = '__all__'
+    def create(self, validated_data):
+        medicine = validated_data['medicine']
+        quantity = validated_data['quantity']
+        order = validated_data['order']
 
-#     def create(self, validated_data):
-#         medicine = validated_data['medicine']
-#         quantity = validated_data['quantity']
-#         order = validated_data['order']
 
-#         selling_price = medicine.selling_price
-#         total_price = selling_price * quantity
-#         profit = (selling_price - medicine.cost_price) * quantity
+        item = OrderedItems.objects.create(**validated_data)
 
-#         item = OrderedItem.objects.create(
-#             **validated_data,
-#             selling_price=selling_price,
-#             total_price=total_price,
-#             profit_per_item=profit
-#         )
+        medicine.quantity -= quantity
+        medicine.save()
 
-#         stock = Medicine.objects.get(medicine=medicine)
-#         stock.quantity -= quantity
-#         stock.save()
+        items = order.items.all()
 
-#         order.update_total()
-#         return item
-#     def calculate_profit(self, order):
-#         total_profit = order.ordereditem_set.aggregate(
-#             total=Sum('profit_per_item')
-#         )['total'] or 0
+        total = 0
+        profit = 0
 
-#         Profit.objects.update_or_create(
-#             order=order,
-#             defaults={'profit_amount': total_profit}
-#         )
+        for i in items:
+            total += i.medicine.selling_price * i.quantity
+            profit += (i.medicine.selling_price - i.medicine.cost_price) * i.quantity
 
+        order.total_amount = total
+        order.profit_amount = profit
+        order.save()
+
+        return item
 
 
 

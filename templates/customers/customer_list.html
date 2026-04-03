@@ -11,16 +11,15 @@
     <a href="{% url 'customers:add_customer' %}">Add Customer</a>
     <table border="1">
         <tr>
-            <th>ID</th>
             <th>Name</th>
             <th>Age</th>
             <th>Address</th>
             <th>city</th>
             <th>Phone</th>
+            <th>Action</th>
         </tr>
         {% for customer in object_list %}
         <tr>
-            <td>{{ customer.id }}</td>
             <td>{{ customer.name }}</td>
             <td>{{ customer.age }}</td>
             <td>{{ customer.address}}</td>

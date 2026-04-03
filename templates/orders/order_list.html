@@ -1,44 +1,49 @@
-{% extends 'base.html' %}
-{% block content %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Order List</title>
+</head>
+<body>
+    <h1>Orders</h1>
 
-<h1>Orders</h1>
-
-<a href="{% url 'orders:add_order' %}">Add Order</a>
-
-<table border="1">
-    <tr>
-        <th>ID</th>
-        <th>Date</th>
-        <th>Customer</th>
-        <th>Medicine</th>
-        <th>Quantity</th>
-        <th>Total Amount</th>
-        <th>Status</th>
-        <th>Payment Status</th>
-        <th>Payment Method</th>
-        <th>profit</th>
-        <th>Actions</th>
-    </tr>
-
-    {% for order in object_list %}
-    <tr>
-        <td>{{ order.id }}</td>
-        <td>{{ order.created_at }}</td>
-        <td>{{ order.customer.name }}</td>
-        <td>{{ order.medicine.name }}</td>
-        <td>{{ order.quantity }}</td>
-        <td>{{ order.total_amount }}</td>
-        <td>{{ order.status }}</td>
-        <td>{{ order.payment_status }}</td>
-        <td>{{ order.payment_method }}</td>
-        <td>{{ order.profit_amount }}</td>
-        <td><a href="{% url 'orders:update_order' order.id %}">Update </a>
-                <a href="{% url 'orders:delete_order' order.id %}">
-                Delete
-                </a>
+    <table border="1">
+        <tr>
+            <th>ID</th>
+            <th>Customer</th>
+            <th>Medicine Name</th>
+            <th>Quantity</th>
+            <th>Total Amount</th>
+            <th>Profit</th>
+            <th>Status</th>
+            <th>Payment Status</th>
+            <th>Payment Method</th>
+            <th>Actions</th>
+        </tr>
+        {% for order in object_list %}
+        <tr>
+            <td>{{ order.id }}</td>
+            <td>{{ order.customer.name }}</td>
+            <td>
+                {% for item in order.items.all %}
+                    {{ item.medicine.name }}<br>
+                {% endfor %}
+            </td>
+            <td>
+                {% for item in order.items.all %}
+                    {{ item.quantity }}<br>
+                {% endfor %}
+            </td>
+            <td>{{ order.total_amount }}</td>
+            <td>{{ order.profit_amount }}</td>
+            <td>{{ order.status }}</td>
+            <td>{{ order.payment_status }}</td>
+            <td>{{ order.payment_method }}</td>
+            <td>
+                <a href="{% url 'orders:add_items' order.id %}">Add Items</a>
             </td>
         </tr>
-    {% endfor %}
-</table>
+        {% endfor %}
+    </table>
 
-{% endblock %}
+</body>
+</html>

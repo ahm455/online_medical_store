@@ -12,7 +12,6 @@
     <a href="{% url 'products:add_medicine' %}">Add Medicine</a>
     <table border="1">
         <tr>
-            <th>ID</th>
             <th>Name</th>
             <th>Potency</th>
             <th>Stock</th>
@@ -23,7 +22,6 @@
         </tr>
         {% for medicine in object_list  %}
         <tr>
-            <td>{{ medicine.id }}</td>
             <td>{{ medicine.name }}</td>
             <td>{{ medicine.potency }}</td>
             <td>{{ medicine.quantity }}</td>

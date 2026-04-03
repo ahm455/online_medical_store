@@ -1,49 +1,51 @@
-from django.views.generic import ListView ,CreateView ,UpdateView ,DeleteView
-from .models import Order
-from django.urls import reverse_lazy
-from customers.models import Customer
-from products.models import Medicine
+from rest_framework import generics
+from rest_framework.response import Response
+from django.db.models import Sum, F, Model
 from django.db.models.functions import TruncDate
-from django.db.models import Sum
+import orders
+from .models import Order, OrderedItems
+from .serializers import OrderSerializer, OrderedItemSerializer
+from django.views.generic import ListView
 
-class add_order(CreateView):
+class CreateOrderView(generics.ListCreateAPIView):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+
+class OrderDeleteUpdateView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = OrderSerializer
+    lookup_url_kwarg = 'order_id'
+    queryset = Order.objects.all()
+
+class OrderListView(ListView):
     model = Order
-    fields = ['customer','medicine','quantity','status','payment_status','payment_method']
-    success_url = reverse_lazy('orders:order_list') 
 
-    def form_valid(self, form):
-        order = form.save(commit=False)
-        medicine = order.medicine
-        quantity = order.quantity
-        cost_price = medicine.cost_price
-        selling_price = medicine.selling_price
-        order.selling_price = selling_price
-        order.total_amount = selling_price * quantity
-        order.profit_amount = (selling_price - cost_price) * quantity
-        order.save()
-        return super().form_valid(form)
-
-class order_list(ListView):
-    model = Order
-    template_name = "order_list.html" 
-
-class daily_profit(ListView):
-    template_name = "orders/daily_profit.html"
-    context_object_name = "profits"
+class AddItemsView(generics.ListCreateAPIView):
+    serializer_class = OrderedItemSerializer
 
     def get_queryset(self):
-        qs = (
+        order_id = self.kwargs['order_id']
+        return OrderedItems.objects.filter(order_id=order_id)
+
+    def perform_create(self, serializer):
+        order_id = self.kwargs['order_id']
+        item = serializer.save(order_id=order_id)
+        order = item.order
+        totals = order.items.aggregate(
+            total_amount=Sum(F('medicine__selling_price') * F('quantity')),
+            profit_amount=Sum((F('medicine__selling_price') - F('medicine__cost_price')) * F('quantity'))
+        )
+        order.total_amount = totals['total_amount'] or 0
+        order.profit_amount = totals['profit_amount'] or 0
+        order.save()
+
+class DailyProfitView(generics.ListAPIView):
+    def get_queryset(self):
+        return (
             Order.objects
             .values(date=TruncDate('created_at'))
             .annotate(total_profit=Sum('profit_amount'))
             .order_by('-date')
         )
-        return qs
-class update_order(UpdateView):
-    model = Order
-    fields = '__all__'
-    success_url = reverse_lazy('orders:order_list')         
 
-class delete_order(DeleteView):
-        model = Order
-        success_url = reverse_lazy('orders:order_list')
+    def list(self, request, *args, **kwargs):
+        return Response(self.get_queryset())
