@@ -2,14 +2,15 @@ from django.db import models
 from customers.models import Customer
 from products.models import Medicine
 from orders.common import *
+from orders.constants import *
 
 class Order(CreateUpdateTime):
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE,related_name="customers")
+    customer = models.ForeignKey(Customer, null=True, blank=True, on_delete=models.SET_NULL,related_name="customers")
     medicine = models.ManyToManyField(Medicine, through='OrderedItems')
 
-    status = models.CharField(max_length=10, choices=choices.status, default=choices.status[0])
-    payment_status = models.CharField(max_length=10, choices=choices.payment_status, default=choices.payment_status[0])
-    payment_method = models.CharField(max_length=10, choices=choices.payment_method, blank=True)
+    status = models.CharField(max_length=10, choices=OrderStatusChoices, default=OrderStatusChoices.PENDING)
+    payment_status = models.CharField(max_length=10, choices=PaymentStatusChoices, default=PaymentStatusChoices.UNPAID)
+    payment_method = models.CharField(max_length=10, choices=PaymentMethodChoices, blank=True)
 
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     profit_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)

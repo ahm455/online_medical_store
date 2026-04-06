@@ -4,21 +4,27 @@ from django.db.models.functions import TruncDate
 import orders
 from .models import Order, OrderedItems
 from .serializers import OrderSerializer, OrderedItemSerializer
-from django.views.generic import ListView
+
 
 class CreateListOrderView(generics.ListCreateAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
 
-class OrderDeleteUpdateView(generics.RetrieveUpdateDestroyAPIView):
+class OrderRetrieveDeleteUpdateView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = OrderSerializer
     lookup_url_kwarg = 'order_id'
     queryset = Order.objects.all()
 
-class OrderListView(ListView):
-    model = Order
+class OrderListView(generics.ListAPIView):
+    queryset = OrderedItems.objects.all()
+    serializer_class = OrderedItemSerializer
 
-class AddItemsView(generics.ListCreateAPIView):
+class OrderItemsRetrieveDeleteUpdateView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = OrderedItemSerializer
+    lookup_url_kwarg = 'order_id'
+    queryset = OrderedItems.objects.all()
+
+class AddListItemsView(generics.ListCreateAPIView):
     serializer_class = OrderedItemSerializer
 
     def get_queryset(self):
