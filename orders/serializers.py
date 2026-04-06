@@ -1,5 +1,8 @@
 from rest_framework import serializers
 from .models import Order,OrderedItems
+from django.core.exceptions import ValidationError
+from django.utils import timezone
+from datetime import timedelta,date
 from products.models import Medicine
 from django.db.models import Sum
 from django.db.models.functions import TruncDate
@@ -7,7 +10,7 @@ from django.db.models.functions import TruncDate
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
-        fields = ['id', 'customer','status','payment_method','payment_status']
+        fields = '__all__'
 
 
 class OrderedItemSerializer(serializers.ModelSerializer):
@@ -21,27 +24,70 @@ class OrderedItemSerializer(serializers.ModelSerializer):
         medicine = validated_data['medicine']
         quantity = validated_data['quantity']
         order = validated_data['order']
-
+        today = date.today()
 
         item = OrderedItems.objects.create(**validated_data)
 
         medicine.quantity -= quantity
+        if medicine.quantity < 0:
+            raise ValidationError("No stock avaliable")
+        if medicine.expiry_date < timezone.now().date() or medicine.expiry_date<= today + timedelta(days=20):
+            raise ValidationError("The expiry date is very near or past.")
+
         medicine.save()
 
-        items = order.items.all()
-
-        total = 0
-        profit = 0
-
-        for i in items:
-            total += i.medicine.selling_price * i.quantity
-            profit += (i.medicine.selling_price - i.medicine.cost_price) * i.quantity
+        medicines = validated_data['medicine']
+        total = order.total_amount
+        profit = order.profit_amount
+        total += medicines.selling_price * medicines.quantity
+        profit += (medicines.selling_price - medicines.cost_price) * medicines.quantity
 
         order.total_amount = total
         order.profit_amount = profit
         order.save()
 
         return item
+
+    def update(self, instance, validated_data):
+        old_quantity = instance.quantity
+        old_medicine = instance.medicine
+        new_medicine = validated_data.get('medicine', old_medicine)
+        new_quantity = validated_data.get('quantity', old_quantity)
+        order = validated_data.get('order', instance.order)
+
+        today = date.today()
+
+        if old_medicine != new_medicine:
+            old_medicine.quantity += old_quantity
+            old_medicine.save()
+            stock_change = new_quantity
+        else:
+            stock_change = new_quantity - old_quantity
+
+        if new_medicine.quantity - stock_change < 0:
+            raise ValidationError("No stock available for the selected medicine.")
+
+        if new_medicine.expiry_date < timezone.now().date() or new_medicine.expiry_date <= today + timedelta(days=20):
+            raise ValidationError("The expiry date is very near or past.")
+
+        instance.medicine = new_medicine
+        instance.quantity = new_quantity
+        instance.save()
+
+        new_medicine.quantity -= stock_change
+        new_medicine.save()
+
+        total = 0
+        profit = 0
+        for medicine in order.items.all():
+            total += medicine.items.selling_price * medicine.quantity
+            profit += (medicine.items.selling_price - medicine.items.cost_price) * medicine.quantity
+
+        order.total_amount = total
+        order.profit_amount = profit
+        order.save()
+
+        return instance
 
 
 

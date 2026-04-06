@@ -6,11 +6,11 @@ from .models import Medicine
 from .serializer import MedicineSerializer
 
 
-class CreateMedicineView(generics.ListCreateAPIView):
+class CreateListMedicineView(generics.ListCreateAPIView):
     queryset = Medicine.objects.all()
     serializer_class = MedicineSerializer
 
-class MedicineDeleteUpdateView(generics.RetrieveUpdateDestroyAPIView):
+class MedicineRetrieveDeleteUpdateView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = MedicineSerializer
     lookup_url_kwarg = 'medicine_id'
     queryset = Medicine.objects.all()

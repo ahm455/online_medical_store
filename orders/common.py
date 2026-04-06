@@ -6,20 +6,3 @@ class CreateUpdateTime(models.Model):
 
     class Meta:
         abstract = True
-
-class choices:
-    payment_method = (
-        ('cash', "cash"),
-        ('card', "card"),
-        ('online', "online"),
-    )
-
-    payment_status = (
-        ('paid', "paid"),
-        ('unpaid', "unpaid")
-    )
-    status = (
-        ('pending', "pending"),
-        ('shipped', "shipped"),
-        ('Delivered', "delivered"),
-    )
