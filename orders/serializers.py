@@ -78,6 +78,7 @@ class OrderedItemSerializer(serializers.ModelSerializer):
 
         total = 0
         profit = 0
+
         for product in order.items.all():
             total += product.medicine.selling_price * product.quantity
             profit += (product.medicine.selling_price - product.medicine.cost_price) * product.quantity
