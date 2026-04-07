@@ -4,8 +4,7 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 from datetime import timedelta,date
 from products.models import Medicine
-from django.db.models import Sum
-from django.db.models.functions import TruncDate
+
 
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:
@@ -79,9 +78,9 @@ class OrderedItemSerializer(serializers.ModelSerializer):
 
         total = 0
         profit = 0
-        for medicine in order.items.all():
-            total += medicine.items.selling_price * medicine.quantity
-            profit += (medicine.items.selling_price - medicine.items.cost_price) * medicine.quantity
+        for product in order.items.all():
+            total += product.medicine.selling_price * product.quantity
+            profit += (product.medicine.selling_price - product.medicine.cost_price) * product.quantity
 
         order.total_amount = total
         order.profit_amount = profit

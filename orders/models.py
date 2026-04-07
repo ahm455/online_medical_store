@@ -5,7 +5,7 @@ from orders.common import *
 from orders.constants import *
 
 class Order(CreateUpdateTime):
-    customer = models.ForeignKey(Customer, null=True, blank=True, on_delete=models.SET_NULL,related_name="customers")
+    customer = models.ForeignKey(Customer, null=True, blank=True, on_delete=models.SET_NULL,related_name="orders")
     medicine = models.ManyToManyField(Medicine, through='OrderedItems')
 
     status = models.CharField(max_length=10, choices=OrderStatusChoices, default=OrderStatusChoices.PENDING)
@@ -21,7 +21,7 @@ class Order(CreateUpdateTime):
 
 class OrderedItems(CreateUpdateTime):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="items")
-    medicine = models.ForeignKey(Medicine, on_delete=models.CASCADE,related_name="medicines")
+    medicine = models.ForeignKey(Medicine, on_delete=models.CASCADE,related_name="ordered")
     quantity = models.IntegerField()
 
     def __str__(self):
