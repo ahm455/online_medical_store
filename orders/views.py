@@ -6,6 +6,7 @@ from .models import Order, OrderedItems
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.authentication import BasicAuthentication, SessionAuthentication
 from .serializers import OrderSerializer, OrderedItemSerializer
+from django.db.models import Sum
 
 
 class CreateListOrderView(generics.ListCreateAPIView):
